@@ -25,8 +25,8 @@ class Student {
     required this.gender
   }) : id = uuid.v4();
 
-  final String id, firstName, lastName;
-  final Department department;
-  final int grade;
-  final Gender gender;
+  String id, firstName, lastName;
+  Department department;
+  int grade;
+  Gender gender;
 }
