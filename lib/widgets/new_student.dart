@@ -1,23 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lab_1/data/dummy_data.dart';
 import 'package:lab_1/models/student.dart';
+import '../models/department.dart';
+import '../providers/students_provider.dart';
 
-class NewStudent extends StatefulWidget {
-  const NewStudent({super.key, required this.onAdd, this.student});
+class NewStudent extends ConsumerStatefulWidget {
+  const NewStudent({super.key, this.student});
 
-  final void Function(Student student) onAdd;
   final Student? student;
 
   @override
-  State<StatefulWidget> createState() {
+  _NewStudentState createState() {
     return _NewStudentState();
   }
 }
 
-class _NewStudentState extends State<NewStudent> {
-  late final _firstNameController = TextEditingController(text: widget.student?.firstName ?? '');
-  late final _lastNameController = TextEditingController(text: widget.student?.lastName ?? '');
-  late final _gradeController = TextEditingController(text: widget.student?.grade.toString() ?? '');
-  Department _selectedDepartment = Department.it;
+class _NewStudentState extends ConsumerState<NewStudent> {
+  late final _firstNameController =
+      TextEditingController(text: widget.student?.firstName ?? '');
+  late final _lastNameController =
+      TextEditingController(text: widget.student?.lastName ?? '');
+  late final _gradeController =
+      TextEditingController(text: widget.student?.grade.toString() ?? '');
+  Department _selectedDepartment = availableDepartments[0];
   Gender _selectedGender = Gender.female;
 
   @override
@@ -61,24 +67,19 @@ class _NewStudentState extends State<NewStudent> {
       return;
     }
 
-    if(widget.student != null) {
-      Student updatedStudent = widget.student!;
-      updatedStudent.firstName = _firstNameController.text;
-      updatedStudent.lastName = _lastNameController.text;
-      updatedStudent.department = _selectedDepartment;
-      updatedStudent.grade = int.tryParse(_gradeController.text)!;
-      updatedStudent.gender = _selectedGender;
+    final student = Student(
+      firstName: _firstNameController.text,
+      lastName: _lastNameController.text,
+      department: _selectedDepartment,
+      grade: int.tryParse(_gradeController.text)!,
+      gender: _selectedGender,
+    );
 
-      widget.onAdd(widget.student!);
+    if (widget.student != null) {
+      ref.read(studentsProvider.notifier).editStudent(
+          student, ref.read(studentsProvider).indexOf(widget.student!));
     } else {
-      widget.onAdd(
-        Student(
-            firstName: _firstNameController.text,
-            lastName: _lastNameController.text,
-            department: _selectedDepartment,
-            grade: int.tryParse(_gradeController.text)!,
-            gender: _selectedGender),
-      );
+      ref.read(studentsProvider.notifier).addStudent(student);
     }
 
     Navigator.pop(context);
@@ -90,27 +91,33 @@ class _NewStudentState extends State<NewStudent> {
       padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
       child: Column(children: [
         TextField(
-            maxLength: 50,
-            controller: _firstNameController,
-            decoration: const InputDecoration(label: Text('First Name'))),
+          maxLength: 50,
+          controller: _firstNameController,
+          decoration: const InputDecoration(label: Text('First Name')),
+        ),
         TextField(
-            maxLength: 50,
-            controller: _lastNameController,
-            decoration: const InputDecoration(label: Text('Last Name'))),
+          maxLength: 50,
+          controller: _lastNameController,
+          decoration: const InputDecoration(label: Text('Last Name')),
+        ),
         TextField(
-            maxLength: 1,
-            keyboardType: TextInputType.number,
-            controller: _gradeController,
-            decoration: const InputDecoration(label: Text('Grade'))),
+          maxLength: 1,
+          keyboardType: TextInputType.number,
+          controller: _gradeController,
+          decoration: const InputDecoration(label: Text('Grade')),
+        ),
         Row(
           children: [
             Expanded(
               child: DropdownButton<Department>(
                 isExpanded: true,
                 value: _selectedDepartment,
-                items: Department.values
-                    .map((item) =>
-                        DropdownMenuItem(value: item, child: Text(item.name)))
+                items: availableDepartments
+                    .map((item) => DropdownMenuItem(
+                        value: item,
+                        child: Row(
+                          children: [Text(item.name), Icon(item.icon)],
+                        )))
                     .toList(),
                 onChanged: (value) {
                   if (value == null) return;

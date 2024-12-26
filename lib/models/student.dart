@@ -1,17 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import 'department.dart';
 
 const uuid = Uuid();
-
-enum Department { finance, law, it, medical }
-
-const departmentIcons = {
-  Department.finance: Icons.currency_bitcoin,
-  Department.it: Icons.computer,
-  Department.law: Icons.menu_book,
-  Department.medical: Icons.medical_services
-};
- // cruelty_free_outlined
 
 enum Gender { male, female }
 

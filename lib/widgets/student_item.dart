@@ -10,7 +10,7 @@ class StudentItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color:
-          student.gender == Gender.female ? Colors.pink[50] : Colors.teal[50],
+          student.gender == Gender.female ? Colors.pink[100] : Colors.blue[100],
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 20.0,
@@ -29,7 +29,7 @@ class StudentItem extends StatelessWidget {
             ),
             Row(
               children: [
-                Icon(departmentIcons[student.department]),
+                Icon(student.department.icon),
                 Text(student.grade.toString())
               ],
             ),
