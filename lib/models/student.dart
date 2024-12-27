@@ -1,7 +1,4 @@
-import 'package:uuid/uuid.dart';
 import 'department.dart';
-
-const uuid = Uuid();
 
 enum Gender { male, female }
 
@@ -12,10 +9,12 @@ class Student {
     required this.lastName,
     required this.department,
     required this.grade,
-    required this.gender
-  }) : id = uuid.v4();
+    required this.gender,
+    required this.id
+  });
 
-  String id, firstName, lastName;
+  String id;
+  String firstName, lastName;
   Department department;
   int grade;
   Gender gender;

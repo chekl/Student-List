@@ -14,27 +14,11 @@ class StudentList extends ConsumerWidget {
   final List<Student> students;
 
   final void Function(Student student) onEditStudent;
-  final void Function() onUndo;
+  final void Function(Student student) onUndo;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    void removeStudent(Student student) {
-      final studentIndex = students.indexOf(student);
 
-      ref.read(studentsProvider.notifier).removeStudent(student);
-
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        duration: const Duration(seconds: 3),
-        content: const Text("Student was deleted"),
-        action: SnackBarAction(
-          label: "Undo",
-          onPressed: () {
-            ref.read(studentsProvider.notifier).insertStudent(student, studentIndex);
-          },
-        ),
-      ));
-    }
     return ListView.builder(
         itemCount: students.length,
         itemBuilder: (context, index) => Dismissible(
@@ -42,8 +26,7 @@ class StudentList extends ConsumerWidget {
             background: Container(color: Colors.red[900]
             ),
             onDismissed: (direction) => {
-              removeStudent(students[index]),
-              onUndo()
+              onUndo(students[index])
             },
             child: InkWell(
               key: ValueKey(students[index]),

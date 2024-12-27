@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lab_1/data/dummy_data.dart';
 import 'package:lab_1/models/student.dart';
 import '../models/department.dart';
 import '../providers/students_provider.dart';
+import 'package:http/http.dart' as http;
 
 class NewStudent extends ConsumerStatefulWidget {
   const NewStudent({super.key, this.student});
@@ -43,7 +46,7 @@ class _NewStudentState extends ConsumerState<NewStudent> {
     super.dispose();
   }
 
-  void _submitStudentData() {
+  void _submitStudentData () async {
     final enteredGrade = int.tryParse(_gradeController.text);
     final gradeIsInvalid =
         enteredGrade == null || enteredGrade <= 0 || enteredGrade > 6;
@@ -67,21 +70,27 @@ class _NewStudentState extends ConsumerState<NewStudent> {
       return;
     }
 
-    final student = Student(
-      firstName: _firstNameController.text,
-      lastName: _lastNameController.text,
-      department: _selectedDepartment,
-      grade: int.tryParse(_gradeController.text)!,
-      gender: _selectedGender,
-    );
-
     if (widget.student != null) {
+      final editedStudent = Student(
+          firstName: _firstNameController.text,
+          lastName: _lastNameController.text,
+          department: _selectedDepartment,
+          grade: int.tryParse(_gradeController.text)!,
+          gender: _selectedGender,
+          id: widget.student!.id);
+
+
       ref.read(studentsProvider.notifier).editStudent(
-          student, ref.read(studentsProvider).indexOf(widget.student!));
+          editedStudent, ref.read(studentsProvider).indexOf(widget.student!));
     } else {
-      ref.read(studentsProvider.notifier).addStudent(student);
+      ref.read(studentsProvider.notifier).addStudent(_firstNameController.text,
+         _lastNameController.text,
+         _selectedDepartment,
+         int.tryParse(_gradeController.text)!,
+         _selectedGender);
     }
 
+    if (!context.mounted) return;
     Navigator.pop(context);
   }
 

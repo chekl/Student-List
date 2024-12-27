@@ -11,11 +11,12 @@ class Students extends ConsumerWidget {
   const Students({super.key, this.department, required this.onUndo});
 
   final Department? department;
-  final void Function() onUndo;
+  final void Function(Student student) onUndo;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var myStudents = ref.watch(studentsProvider);
+    final isLoading = ref.watch(studentsProvider.notifier.select((state) => state.isLoading));
 
     if (department != null) {
       myStudents = myStudents.where((std) => std.department.id == department?.id).toList();
@@ -59,7 +60,7 @@ class Students extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          Expanded(child: mainContent),
+          Expanded(child: isLoading ? const Center(child: CircularProgressIndicator()) : mainContent),
         ],
       ),
     );
